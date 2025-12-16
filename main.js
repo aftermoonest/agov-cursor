@@ -86,24 +86,36 @@ import animationData from './cursor-hover.json';
 
     // Handle Hover Logic
     // We want to activate ONLY when hovering specific elements
-    // Handle Hover Logic
     const handleMouseOver = (e) => {
         // 1. Check if we are hovering a "Big Card" target
         const targetContainer = e.target.closest('.lottie-cursor-target');
 
-        // 2. Check if we are hovering a "Normal Button" (which should be EXCLUDED)
-        //    This includes links, buttons, inputs, etc.
-        const excludedElement = e.target.closest('a, button, input, select, textarea, [role="button"]');
+        if (targetContainer) {
+            // We are inside a target.
+            // Check if we are hovering a "Normal Button" inside the card.
+            const excludedElement = e.target.closest('a, button, input, select, textarea, [role="button"]');
 
-        if (targetContainer && !excludedElement) {
-            // We are inside a target AND NOT on a button -> SHOW Custom Cursor
-            isHovering = true;
-            document.body.classList.add('cursor-active');
-            cursorContainer.classList.add('is-visible');
+            // Logic: Exclude ONLY if we found an interactive element that is:
+            // 1. NOT the target container itself (e.g. if the card is a link, keep custom cursor)
+            // 2. INSIDE the target container (e.g. a button inside the card)
+
+            const isExcluded = excludedElement &&
+                excludedElement !== targetContainer &&
+                targetContainer.contains(excludedElement);
+
+            if (isExcluded) {
+                // We are hovering a button INSIDE the card -> Hide custom cursor (Show Default)
+                isHovering = false;
+                document.body.classList.remove('cursor-active');
+                cursorContainer.classList.remove('is-visible');
+            } else {
+                // We are hovering the card itself (even if it's a link) or content -> Show Custom Cursor
+                isHovering = true;
+                document.body.classList.add('cursor-active');
+                cursorContainer.classList.add('is-visible');
+            }
         } else {
-            // We are either:
-            // a) Not in a target at all
-            // b) Inside a target BUT on a button/link -> HIDE Custom Cursor (Show Default)
+            // We are not in a target at all
             isHovering = false;
             document.body.classList.remove('cursor-active');
             cursorContainer.classList.remove('is-visible');
