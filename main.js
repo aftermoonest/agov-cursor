@@ -86,15 +86,24 @@ import animationData from './cursor-hover.json';
 
     // Handle Hover Logic
     // We want to activate ONLY when hovering specific elements
+    // Handle Hover Logic
     const handleMouseOver = (e) => {
-        // Check if the target or its parents are interactive
-        const target = e.target.closest('a, button, .hover-target, input, select, textarea, [role="button"]');
+        // 1. Check if we are hovering a "Big Card" target
+        const targetContainer = e.target.closest('.lottie-cursor-target');
 
-        if (target) {
+        // 2. Check if we are hovering a "Normal Button" (which should be EXCLUDED)
+        //    This includes links, buttons, inputs, etc.
+        const excludedElement = e.target.closest('a, button, input, select, textarea, [role="button"]');
+
+        if (targetContainer && !excludedElement) {
+            // We are inside a target AND NOT on a button -> SHOW Custom Cursor
             isHovering = true;
             document.body.classList.add('cursor-active');
             cursorContainer.classList.add('is-visible');
         } else {
+            // We are either:
+            // a) Not in a target at all
+            // b) Inside a target BUT on a button/link -> HIDE Custom Cursor (Show Default)
             isHovering = false;
             document.body.classList.remove('cursor-active');
             cursorContainer.classList.remove('is-visible');
@@ -112,12 +121,8 @@ import animationData from './cursor-hover.json';
         }
     });
 
-
     // 6. Animation Loop
     function animate() {
-        // Only update position processing if we are visible or was recently visible?
-        // Actually, we should always track so it doesn't jump when it appears.
-
         cursorX += (mouseX - cursorX) * LERP_FACTOR;
         cursorY += (mouseY - cursorY) * LERP_FACTOR;
 

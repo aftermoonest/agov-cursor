@@ -12,8 +12,18 @@
 <body>
   <div id="app">
     <h1>Custom Video Cursor</h1>
-    <p>Move your mouse around to see the custom cursor!</p>
-    <div class="hover-target">Hover Me</div>
+    <p>Move your mouse around!</p>
+
+    <!-- This button is OUTSIDE the target, so it should be DEFAULT cursor -->
+    <button>Normal Button (Outside)</button>
+
+    <div style="margin-top: 50px; padding: 50px; background: #333; border-radius: 20px;" class="lottie-cursor-target">
+      <h2>Big Card (Target Area)</h2>
+      <p>Hovering here should show the Lottie Cursor.</p>
+
+      <!-- This button is INSIDE the target, but should show DEFAULT cursor (Exclusion) -->
+      <button style="margin-top: 20px;">Normal Button (Inside)</button>
+    </div>
   </div>
 
   <!-- The Custom Cursor Container -->
