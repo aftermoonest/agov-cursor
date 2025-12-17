@@ -25,6 +25,7 @@ import animationData from './cursor-hover.json';
             justify-content: center;
             opacity: 0; /* Hidden by default */
             transition: opacity 0.2s ease;
+            will-change: transform, opacity;
         }
         
         /* Only show if active AND loaded */
@@ -37,6 +38,9 @@ import animationData from './cursor-hover.json';
             height: 100%;
             transform: scale(1);
             transition: transform 0.3s ease;
+            /* Performance hints */
+            will-change: transform;
+            backface-visibility: hidden;
         }
 
         /* Scale up when visible/active */
