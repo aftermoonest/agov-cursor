@@ -70,11 +70,20 @@ import animationData from './cursor-hover.json';
         animationData: animationData
     });
 
-    // Listen for DOMLoaded to ensure it's ready to show
-    animation.addEventListener('DOMLoaded', () => {
-        isLoaded = true;
-        cursorContainer.classList.add('is-loaded');
-    });
+    // Listen for enterFrame to ensure it's actually rendering content
+    let renderedFrames = 0;
+    const checkReady = (e) => {
+        renderedFrames++;
+        // Wait for 2 frames to be sure it's painted
+        if (renderedFrames > 2) {
+            isLoaded = true;
+            cursorContainer.classList.add('is-loaded');
+            // Stop listening once loaded
+            animation.removeEventListener('enterFrame', checkReady);
+        }
+    };
+
+    animation.addEventListener('enterFrame', checkReady);
 
     // 5. Event Listeners
 
