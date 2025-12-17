@@ -1,5 +1,4 @@
-import lottie from 'lottie-web/build/player/lottie_light';
-import animationData from './cursor-hover.json';
+import cursorUrl from './cursor-hover.webp';
 
 (function initCursor() {
     // 1. Inject CSS
@@ -33,9 +32,10 @@ import animationData from './cursor-hover.json';
             opacity: 1;
         }
 
-        #custom-cursor-container svg {
+        #custom-cursor-container img {
             width: 100%;
             height: 100%;
+            object-fit: contain;
             transform: scale(1);
             transition: transform 0.3s ease;
             /* Performance hints */
@@ -44,7 +44,7 @@ import animationData from './cursor-hover.json';
         }
 
         /* Scale up when visible/active */
-        #custom-cursor-container.is-visible svg {
+        #custom-cursor-container.is-visible img {
             transform: scale(1.5);
         }
     `;
@@ -53,6 +53,12 @@ import animationData from './cursor-hover.json';
     // 2. Create DOM Elements
     const cursorContainer = document.createElement('div');
     cursorContainer.id = 'custom-cursor-container';
+
+    const cursorImage = document.createElement('img');
+    cursorImage.src = cursorUrl;
+    cursorImage.alt = "Custom Cursor";
+
+    cursorContainer.appendChild(cursorImage);
     document.body.appendChild(cursorContainer);
 
     // 3. State & Logic
@@ -62,32 +68,13 @@ import animationData from './cursor-hover.json';
     let cursorY = window.innerHeight / 2;
     const LERP_FACTOR = 0.15;
     let isHovering = false;
-    let isLoaded = false;
+    // let isLoaded = false; // logic handled by img.onload
     let animationFrameId;
 
-    // 3. Initialize Lottie
-    const animation = lottie.loadAnimation({
-        container: cursorContainer,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        animationData: animationData
-    });
-
-    // Listen for enterFrame to ensure it's actually rendering content
-    let renderedFrames = 0;
-    const checkReady = (e) => {
-        renderedFrames++;
-        // Wait for 2 frames to be sure it's painted
-        if (renderedFrames > 2) {
-            isLoaded = true;
-            cursorContainer.classList.add('is-loaded');
-            // Stop listening once loaded
-            animation.removeEventListener('enterFrame', checkReady);
-        }
+    // 4. Loading Logic
+    cursorImage.onload = () => {
+        cursorContainer.classList.add('is-loaded');
     };
-
-    animation.addEventListener('enterFrame', checkReady);
 
     // 5. Event Listeners
 
@@ -98,16 +85,16 @@ import animationData from './cursor-hover.json';
     });
 
     // Handle Hover Logic
-    // We want to activate ONLY when hovering specific elements
     const handleMouseOver = (e) => {
         // 1. Check if we are hovering a "Big Card" target
         const targetContainer = e.target.closest('.lottie-cursor-target');
 
+        // 2. Check if we are hovering a "Normal Button" (which should be EXCLUDED)
+        //    This includes links, buttons, inputs, etc.
+        const excludedElement = e.target.closest('a, button, input, select, textarea, [role="button"]');
+
         if (targetContainer) {
             // We are inside a target.
-            // Check if we are hovering a "Normal Button" inside the card.
-            const excludedElement = e.target.closest('a, button, input, select, textarea, [role="button"]');
-
             // Logic: Exclude ONLY if we found an interactive element that is:
             // 1. NOT the target container itself (e.g. if the card is a link, keep custom cursor)
             // 2. INSIDE the target container (e.g. a button inside the card)
