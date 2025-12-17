@@ -9,6 +9,8 @@ export default defineConfig({
             fileName: 'cursor',
             formats: ['iife'] // Immediately Invoked Function Expression for direct browser use
         },
+        target: 'es2015', // Use modern syntax for smaller bundle
+        minify: 'esbuild', // Ensure minification is active
         rollupOptions: {
             // Ensure we don't bundle dependencies if we don't want to, 
             // but for a single-file solution we probably DO want to bundle lottie-web.
