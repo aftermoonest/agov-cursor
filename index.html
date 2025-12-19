@@ -5,8 +5,21 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Video Cursor Test</title>
-  <link rel="stylesheet" href="./style.css">
+  <title>Cursor Hover Demo</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #242424;
+      color: white;
+      font-family: system-ui, sans-serif;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
@@ -14,20 +27,20 @@
     <h1>Animated WebP Cursor</h1>
     <p>Move your mouse around!</p>
 
-    <!-- This button is OUTSIDE the target, so it should be DEFAULT cursor -->
     <button>Normal Button (Outside)</button>
 
-    <div style="margin-top: 50px; padding: 50px; background: #333; border-radius: 20px;" class="lottie-cursor-target">
-      <h2>Big Card (Target Area)</h2>
-      <p>Hovering here should show the Lottie Cursor.</p>
+    <div style="margin-top: 50px; padding: 50px; background: #333; border-radius: 20px;" class="cursor-view">
+      <h2>View Card (Target Area)</h2>
+      <p>Hovering here should show the <strong>View</strong> Cursor.</p>
+      <button style="margin-top: 20px;">Normal Button (Inside)</button>
+    </div>
 
-      <!-- This button is INSIDE the target, but should show DEFAULT cursor (Exclusion) -->
+    <div style="margin-top: 50px; padding: 50px; background: #444; border-radius: 20px;" class="cursor-next">
+      <h2>Next Card (Target Area)</h2>
+      <p>Hovering here should show the <strong>Next</strong> Cursor.</p>
       <button style="margin-top: 20px;">Normal Button (Inside)</button>
     </div>
   </div>
-
-  <!-- The Custom Cursor Container -->
-
 
   <script type="module" src="/main.js"></script>
 </body>

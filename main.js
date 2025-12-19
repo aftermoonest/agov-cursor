@@ -1,4 +1,5 @@
-import cursorUrl from './cursor-hover.webp';
+import viewUrl from './cursor-view.webp';
+import nextUrl from './cursor-next.webp';
 
 (function initCursor() {
     // 1. Inject CSS
@@ -10,7 +11,7 @@ import cursorUrl from './cursor-hover.webp';
             cursor: none !important;
         }
 
-        #custom-cursor-container {
+        .custom-cursor-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -19,128 +20,134 @@ import cursorUrl from './cursor-hover.webp';
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            display: flex;
+            display: none; /* Hidden by default */
             align-items: center;
             justify-content: center;
-            opacity: 0; /* Hidden by default */
+            opacity: 0;
             transition: opacity 0.2s ease;
             will-change: transform, opacity;
         }
         
-        /* Only show if active AND loaded */
-        #custom-cursor-container.is-visible.is-loaded {
+        /* Show when active and loaded */
+        .custom-cursor-container.is-visible.is-loaded {
+            display: flex;
             opacity: 1;
         }
 
-        #custom-cursor-container img {
+        .custom-cursor-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             transform: scale(1);
             transition: transform 0.3s ease;
-            /* Performance hints */
             will-change: transform;
             backface-visibility: hidden;
         }
 
-        /* Scale up when visible/active */
-        #custom-cursor-container.is-visible img {
+        /* Scale up when visible */
+        .custom-cursor-container.is-visible img {
             transform: scale(1.5);
         }
     `;
     document.head.appendChild(style);
 
-    // 2. Create DOM Elements
-    const cursorContainer = document.createElement('div');
-    cursorContainer.id = 'custom-cursor-container';
+    // 2. Create DOM Elements for each cursor
+    const createCursor = (id, url) => {
+        const container = document.createElement('div');
+        container.id = `custom-cursor-${id}`;
+        container.className = 'custom-cursor-container';
 
-    const cursorImage = document.createElement('img');
-    cursorImage.src = cursorUrl;
-    cursorImage.alt = "Custom Cursor";
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = `Custom Cursor ${id}`;
+        img.onload = () => container.classList.add('is-loaded');
 
-    cursorContainer.appendChild(cursorImage);
-    document.body.appendChild(cursorContainer);
+        container.appendChild(img);
+        document.body.appendChild(container);
+        return container;
+    };
 
-    // 3. State & Logic
+    const cursors = {
+        view: {
+            el: createCursor('view', viewUrl),
+            class: 'cursor-view'
+        },
+        next: {
+            el: createCursor('next', nextUrl),
+            class: 'cursor-next'
+        }
+    };
+
+    // 3. State
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let cursorX = window.innerWidth / 2;
     let cursorY = window.innerHeight / 2;
     const LERP_FACTOR = 0.15;
-    let isHovering = false;
-    // let isLoaded = false; // logic handled by img.onload
-    let animationFrameId;
+    let activeCursorKey = null;
 
-    // 4. Loading Logic
-    cursorImage.onload = () => {
-        cursorContainer.classList.add('is-loaded');
-    };
-
-    // 5. Event Listeners
-
-    // Track mouse position
+    // 4. Event Listeners
     document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
     });
 
-    // Handle Hover Logic
+    const hideAllCursors = () => {
+        activeCursorKey = null;
+        document.body.classList.remove('cursor-active');
+        Object.values(cursors).forEach(c => c.el.classList.remove('is-visible'));
+    };
+
     const handleMouseOver = (e) => {
-        // 1. Check if we are hovering a "Big Card" target
-        const targetContainer = e.target.closest('.lottie-cursor-target');
+        // Find which target we are in
+        let targetKey = null;
+        let targetContainer = null;
 
-        // 2. Check if we are hovering a "Normal Button" (which should be EXCLUDED)
-        //    This includes links, buttons, inputs, etc.
-        const excludedElement = e.target.closest('a, button, input, select, textarea, [role="button"]');
+        for (const key in cursors) {
+            targetContainer = e.target.closest(`.${cursors[key].class}`);
+            if (targetContainer) {
+                targetKey = key;
+                break;
+            }
+        }
 
-        if (targetContainer) {
-            // We are inside a target.
-            // Logic: Exclude ONLY if we found an interactive element that is:
-            // 1. NOT the target container itself (e.g. if the card is a link, keep custom cursor)
-            // 2. INSIDE the target container (e.g. a button inside the card)
-
+        if (targetKey) {
+            const excludedElement = e.target.closest('a, button, input, select, textarea, [role="button"]');
             const isExcluded = excludedElement &&
                 excludedElement !== targetContainer &&
                 targetContainer.contains(excludedElement);
 
             if (isExcluded) {
-                // We are hovering a button INSIDE the card -> Hide custom cursor (Show Default)
-                isHovering = false;
-                document.body.classList.remove('cursor-active');
-                cursorContainer.classList.remove('is-visible');
+                hideAllCursors();
             } else {
-                // We are hovering the card itself (even if it's a link) or content -> Show Custom Cursor
-                isHovering = true;
-                document.body.classList.add('cursor-active');
-                cursorContainer.classList.add('is-visible');
+                // Show specific cursor
+                if (activeCursorKey !== targetKey) {
+                    hideAllCursors(); // Hide previous if any
+                    activeCursorKey = targetKey;
+                    document.body.classList.add('cursor-active');
+                    cursors[targetKey].el.classList.add('is-visible');
+                }
             }
         } else {
-            // We are not in a target at all
-            isHovering = false;
-            document.body.classList.remove('cursor-active');
-            cursorContainer.classList.remove('is-visible');
+            hideAllCursors();
         }
     };
 
-    // We can use a global mouseover listener to delegate
     document.addEventListener('mouseover', handleMouseOver);
     document.addEventListener('mouseout', (e) => {
-        // When leaving the window or generic mouseout, we might want to re-check
-        if (e.relatedTarget === null) {
-            isHovering = false;
-            document.body.classList.remove('cursor-active');
-            cursorContainer.classList.remove('is-visible');
-        }
+        if (e.relatedTarget === null) hideAllCursors();
     });
 
-    // 6. Animation Loop
+    // 5. Animation Loop
     function animate() {
         cursorX += (mouseX - cursorX) * LERP_FACTOR;
         cursorY += (mouseY - cursorY) * LERP_FACTOR;
 
-        cursorContainer.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+        if (activeCursorKey) {
+            cursors[activeCursorKey].el.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+        }
 
-        animationFrameId = requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
     }
 
     animate();

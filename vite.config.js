@@ -6,7 +6,7 @@ export default defineConfig({
         lib: {
             entry: resolve(__dirname, 'main.js'),
             name: 'Cursor',
-            fileName: 'cursor',
+            fileName: 'cursor-view',
             formats: ['iife'] // Immediately Invoked Function Expression for direct browser use
         },
         target: 'es2015', // Use modern syntax for smaller bundle
