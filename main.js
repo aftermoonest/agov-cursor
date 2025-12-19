@@ -20,17 +20,16 @@ import nextUrl from './cursor-next.webp';
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            display: none; /* Hidden by default */
-            align-items: center;
-            justify-content: center;
+            display: flex;
+            visibility: hidden;
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
             will-change: transform, opacity;
         }
         
         /* Show when active and loaded */
         .custom-cursor-container.is-visible.is-loaded {
-            display: flex;
+            visibility: visible;
             opacity: 1;
         }
 
