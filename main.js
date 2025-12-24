@@ -102,11 +102,19 @@ import nextUrl from './cursor-next.webp';
         let targetKey = null;
         let targetContainer = null;
 
-        for (const key in cursors) {
-            targetContainer = e.target.closest(`.${cursors[key].class}`);
-            if (targetContainer) {
-                targetKey = key;
-                break;
+        // Check for data attribute first
+        const dataTarget = e.target.closest('[data-custom-cursor]');
+        if (dataTarget) {
+            targetKey = dataTarget.dataset.customCursor;
+            targetContainer = dataTarget;
+        } else {
+            // Fallback to class-based check
+            for (const key in cursors) {
+                targetContainer = e.target.closest(`.${cursors[key].class}`);
+                if (targetContainer) {
+                    targetKey = key;
+                    break;
+                }
             }
         }
 

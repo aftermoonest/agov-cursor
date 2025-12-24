@@ -29,15 +29,22 @@
 
     <button>Normal Button (Outside)</button>
 
-    <div style="margin-top: 50px; padding: 50px; background: #333; border-radius: 20px;" class="cursor-view">
+    <div style="margin-top: 50px; padding: 50px; background: #333; border-radius: 20px;" data-custom-cursor="view">
       <h2>View Card (Target Area)</h2>
       <p>Hovering here should show the <strong>View</strong> Cursor.</p>
       <button style="margin-top: 20px;">Normal Button (Inside)</button>
     </div>
 
+    <!-- Keeping class here to verify fallback works -->
     <div style="margin-top: 50px; padding: 50px; background: #444; border-radius: 20px;" class="cursor-next">
-      <h2>Next Card (Target Area)</h2>
-      <p>Hovering here should show the <strong>Next</strong> Cursor.</p>
+      <h2>Next Card (Target Area - Fallback)</h2>
+      <p>Hovering here should show the <strong>Next</strong> Cursor via Class.</p>
+      <button style="margin-top: 20px;">Normal Button (Inside)</button>
+    </div>
+
+     <div style="margin-top: 50px; padding: 50px; background: #555; border-radius: 20px;" data-custom-cursor="next">
+      <h2>Next Card (Target Area - Data Attribute)</h2>
+      <p>Hovering here should show the <strong>Next</strong> Cursor via Data Attribute.</p>
       <button style="margin-top: 20px;">Normal Button (Inside)</button>
     </div>
   </div>
