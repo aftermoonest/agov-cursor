@@ -2,6 +2,16 @@ import viewUrl from './cursor-view.webp';
 import nextUrl from './cursor-next.webp';
 
 (function initCursor() {
+    // Mobile/Tablet breakpoint - don't initialize on screens 991px and below
+    const MOBILE_BREAKPOINT = 991;
+
+    const isMobileOrTablet = () => window.innerWidth <= MOBILE_BREAKPOINT;
+
+    // Don't initialize custom cursor on mobile/tablet devices
+    if (isMobileOrTablet()) {
+        return;
+    }
+
     // 1. Inject CSS
     const style = document.createElement('style');
     style.innerHTML = `
@@ -156,6 +166,19 @@ import nextUrl from './cursor-next.webp';
 
         requestAnimationFrame(animate);
     }
+
+    // 6. Handle window resize - hide cursors if viewport becomes mobile/tablet
+    let isDisabled = false;
+    window.addEventListener('resize', () => {
+        if (isMobileOrTablet() && !isDisabled) {
+            isDisabled = true;
+            hideAllCursors();
+            // Remove cursor elements from DOM
+            Object.values(cursors).forEach(c => c.el.remove());
+            // Remove event listeners
+            document.removeEventListener('mouseover', handleMouseOver);
+        }
+    });
 
     animate();
 
